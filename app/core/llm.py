@@ -11,6 +11,13 @@ VLLM_GENERATE_URL = os.getenv("VLLM_GENERATE_URL", "http://localhost:8000/genera
 DEFAULT_STOP = ["<|im_end|>"]
 DEFAULT_MAX_TOKENS = 1024
 
+def build_messages(history: List[dict], user_message: str) -> List[dict]:
+    messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_message})
+    return messages
+
+
 async def get_completion(messages: List[Dict[str, str]]) -> str:
     """
     Call the local vLLM server for full-text generation (non-streaming).
