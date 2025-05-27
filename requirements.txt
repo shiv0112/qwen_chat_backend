@@ -1,3 +1,5 @@
+httpx
+redis
 dotenv
 fastapi
 uvicorn
