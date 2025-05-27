@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 
 llm_service/models/*
+test.py
