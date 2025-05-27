@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse, JSONResponse
-from app.schemas.chat_schema import ChatRequest, ChatResponse, ChatChunk
+from app.schemas.chat_schema import ChatRequest, ChatResponse
 from app.services.chat_service import handle_chat, stream_chat
 
 router = APIRouter()

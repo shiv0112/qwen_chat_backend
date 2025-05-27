@@ -5,11 +5,8 @@ import uuid
 import os
 import redis
 from typing import List
+from app.core.settings import SESSION_TTL, MAX_SESSIONS, SESSION_INDEX_KEY, REDIS_URL
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
-SESSION_TTL = int(os.getenv("SESSION_TTL", 3600))         # in seconds
-MAX_SESSIONS = int(os.getenv("MAX_SESSIONS", 100))        # max concurrent sessions
-SESSION_INDEX_KEY = "session_index"                       # Redis sorted set key
 
 r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
