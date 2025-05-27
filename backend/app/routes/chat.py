@@ -5,18 +5,12 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse, JSONResponse
 
 from app.schemas.chat_schemas import ChatRequest, ChatResponse
-from app.utils.session_store import delete_session, get_session, save_session
+from app.utils.session_store import get_session, save_session
 from app.utils.prompt_builder import build_prompt
 from app.config import (
     SYSTEM_PROMPT,
     MAX_CONTEXT_LENGTH,
-    MAX_TOKENS,
-    VLLM_ENDPOINT,
-    TEMPERATURE,
-    TOP_P,
-    TOP_K,
-    PRESENCE_PENALTY,
-    FREQUENCY_PENALTY
+    VLLM_ENDPOINT
 )
 
 router = APIRouter()
