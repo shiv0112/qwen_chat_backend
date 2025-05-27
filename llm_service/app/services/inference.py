@@ -32,8 +32,9 @@ async def generate_response(req: GenRequest):
         outputs = await asyncio.get_event_loop().run_in_executor(
             None, lambda: llm.generate(prompts, sampling_params)
         )
-        text = outputs[0].outputs[0].text.split("<|im_end|>")[0]
-        return {"text": text}
+        text = outputs[0].outputs[0].text
+        print("\n=== Raw Output ===\n", text, "\n==================\n")
+        return {"text": text.split("<|im_end|>")[0]}
 
     async def token_stream() -> AsyncGenerator[str, None]:
         prev_text = ""
