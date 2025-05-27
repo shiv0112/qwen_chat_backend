@@ -42,9 +42,9 @@ services:
 
   chainlit-ui:
     build:
-      context: ./chainlit
+      context: ./frontend
     image: vllm-qwen3-chainlit:latest
-    container_name: chainlit-ui
+    container_name: frontend-service-qwen3
     ports:
       - "8007:8007"
     depends_on:
