@@ -1,19 +1,28 @@
-from pydantic import BaseModel
-from typing import List, Optional
+# app/schemas/chat_schemas.py
 
-class ChatMessage(BaseModel):
-    role: str
-    content: str
+from pydantic import BaseModel
+from typing import Optional
+from app.config import (
+    MAX_TOKENS,
+    TEMPERATURE,
+    TOP_P,
+    TOP_K,
+    PRESENCE_PENALTY,
+    FREQUENCY_PENALTY
+)
 
 class ChatRequest(BaseModel):
+    message: str
     session_id: Optional[str] = None
-    messages: List[ChatMessage]
-    temperature: Optional[float] = 0.7
-    top_p: Optional[float] = 0.9
-    top_k: Optional[int] = 50
-    max_tokens: Optional[int] = 512
+    temperature: Optional[float] = TEMPERATURE
+    max_tokens: Optional[int] = MAX_TOKENS
+    top_p: Optional[float] = TOP_P
+    top_k: Optional[int] = TOP_K
+    presence_penalty: Optional[float] = PRESENCE_PENALTY
+    frequency_penalty: Optional[float] = FREQUENCY_PENALTY
     stream: Optional[bool] = False
 
 class ChatResponse(BaseModel):
-    role: str = "assistant"
-    content: str
+    session_id: str
+    reply: str
+    tokens_used: Optional[int]

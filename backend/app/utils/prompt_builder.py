@@ -1,31 +1,19 @@
-from app.config import DEFAULT_SYSTEM_PROMPT, MAX_CONTEXT_LENGTH, MAX_TOKENS
+from app.config import MAX_CONTEXT_LENGTH, MAX_TOKENS
 
-def count_tokens(messages: list) -> int:
-    # Simple approximation: 1 word = 1.3 tokens, adjust based on real tokenizer if needed
-    total = 0
-    for msg in messages:
-        total += int(len(msg["content"].split()) * 1.3)
-    return total
-
-
-def build_prompt(system_prompt: str, messages: list, max_model_len: int = MAX_CONTEXT_LENGTH, reserved_response_tokens: int = MAX_TOKENS):
+def build_prompt(system_prompt: str, messages: list, session_tokens_used: int, max_model_len: int = MAX_CONTEXT_LENGTH, reserved_response_tokens: int = MAX_TOKENS):
     """
-    Builds a trimmed prompt including system prompt and latest messages
-    that fits within the context window.
+    Builds a trimmed prompt using already tracked session token usage.
+    Removes older messages until the total token count is within the model's context limit.
     """
-    prompt = [{"role": "system", "content": system_prompt}]
     available_tokens = max_model_len - reserved_response_tokens
+    prompt = [{"role": "system", "content": system_prompt}]
 
-    # Reverse messages to keep latest messages and add until we exceed context
-    total_tokens = count_tokens(prompt)
-    retained_messages = []
+    # If tokens used so far exceeds available tokens, we trim messages
+    if session_tokens_used > available_tokens:
+        # Approximate average tokens per message
+        avg_tokens_per_msg = session_tokens_used // len(messages) if messages else 0
+        tokens_to_trim = session_tokens_used - available_tokens
+        messages_to_trim = (tokens_to_trim // avg_tokens_per_msg) + 1 if avg_tokens_per_msg else 0
+        messages = messages[messages_to_trim:]  # keep latest
 
-    for msg in reversed(messages):
-        msg_tokens = count_tokens([msg])
-        if total_tokens + msg_tokens > available_tokens:
-            break
-        retained_messages.insert(0, msg)
-        total_tokens += msg_tokens
-
-    prompt.extend(retained_messages)
-    return prompt
+    return prompt + messages
