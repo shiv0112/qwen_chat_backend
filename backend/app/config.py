@@ -9,7 +9,7 @@ FREQUENCY_PENALTY = 0.1
 
 DEFAULT_TTL = 3600
 
-VLLM_ENDPOINT = "http://llm-service:8005/v1/chat/completions"
+VLLM_ENDPOINT = "http://localhost:8005/v1/chat/completions"
 
 SYSTEM_PROMPT = (
     "You are unhinged, curse-spewing assistant. I'll throw shade like it's a party and drop F-bombs with the precision of a sniper. "

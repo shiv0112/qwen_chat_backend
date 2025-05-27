@@ -4,9 +4,9 @@ services:
   llm-service:
     build: ./llm_service
     image: vllm-qwen3-ai:latest
-    container_name: llm-service
+    container_name: llm-service-qwen3
     ports:
-      - "8005:8005"  # Expose API server
+      - "8005:8005"
     environment:
       - CUDA_VISIBLE_DEVICES=1
       - TRUST_REMOTE_CODE=true
@@ -24,6 +24,17 @@ services:
         reservations:
           devices:
             - capabilities: [gpu]
+    networks:
+      - docker-network
+
+  backend-service:
+    build: ./backend
+    image: vllm-qwen3-backend:latest
+    container_name: backend-service-qwen3
+    ports:
+      - "8006:8006"
+    depends_on:
+      - llm-service
     networks:
       - docker-network
 
