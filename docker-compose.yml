@@ -1,37 +1,26 @@
 version: "3.9"
 
 services:
-  qwen3-api:
-    build: .
-    container_name: qwen3-api
-    image: qwen3-api:latest
-
-    # ── Networking ───────────────────────────────────────────────────────
+  llm-service:
+    build: ./llm_service
+    image: vllm-qwen3-ai:latest
+    container_name: llm-service
     ports:
-      - "8005:8005"         # host:container
-
-    # ── Environment ──────────────────────────────────────────────────────
+      - "8005:8005"  # host:container port
     environment:
-      - CUDA_VISIBLE_DEVICES=1     # <── add this
+      - CUDA_VISIBLE_DEVICES=1
       - MODEL_PATH=./models
       - TRUST_REMOTE_CODE=true
       - N_THREADS=4
       - GPU_ID=0
-
     volumes:
-      - ./:/app
-
-    # ── GPU access (Docker >= 19.03 + NVIDIA Container Runtime) ──────────
+      - ./llm_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8005
     deploy:
       resources:
         reservations:
           devices:
             - capabilities: [gpu]
-
-    # ── Override CMD to listen on 8004 ───────────────────────────────────
-    command: >
-      uvicorn app_v3:app --host 0.0.0.0 --port 8005 --workers 1
-
     networks:
       - docker-network
 

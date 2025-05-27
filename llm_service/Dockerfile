@@ -9,7 +9,7 @@ RUN pip install --upgrade pip \
  && pip install --no-cache-dir -r requirements.txt
 
 # Expose FastAPI default port
-EXPOSE 8005
+# EXPOSE 8005
 
 # Run Uvicorn
-CMD ["uvicorn", "app_v3:app", "--host", "0.0.0.0", "--port", "8005"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8005"]
