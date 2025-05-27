@@ -6,16 +6,18 @@ services:
     image: vllm-qwen3-ai:latest
     container_name: llm-service
     ports:
-      - "8005:8005"  # host:container port
+      - "8005:8005"  # Expose API server
     environment:
       - CUDA_VISIBLE_DEVICES=1
-      - MODEL_PATH=./models
       - TRUST_REMOTE_CODE=true
-      - N_THREADS=4
-      - GPU_ID=0
     volumes:
       - ./llm_service:/app
-    command: uvicorn main:app --host 0.0.0.0 --port 8005
+    command: >
+      python3 -m vllm.entrypoints.openai.api_server
+      --model ./models
+      --tokenizer ./models
+      --port 8005
+      --dtype float16
     deploy:
       resources:
         reservations:

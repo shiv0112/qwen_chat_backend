@@ -1,11 +1,1 @@
-transformers
-fastapi
-uvicorn
-gunicorn
-pydantic
-numpy
-accelerate
-bitsandbytes
-websockets
-flash-attn
 vllm

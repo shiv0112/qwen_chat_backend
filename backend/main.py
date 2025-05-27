@@ -1,37 +1,31 @@
-# main.py
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from app.routers import chat
+from app.routes import chat, sessions
 
-# Load environment variables from .env
-load_dotenv()
+app = FastAPI(title="Fuckwad AI Backend", version="1.0")
 
-app = FastAPI(
-    title="Qwen Chat Backend",
-    description="FastAPI + Redis based LLM backend",
-    version="1.0.0"
-)
-
-# Optional: Set allowed origins for frontend access
+# CORS setup – modify as needed
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # or your frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routers
+# Register routes
 app.include_router(chat.router, prefix="/chat", tags=["Chat"])
+app.include_router(sessions.router, prefix="/sessions", tags=["Session"])
 
-# Root route
-@app.get("/")
-def root():
-    return {"message": "Qwen Chat Backend is running."}
+# Optional: TTL cleanup or model warmup on startup
+@app.on_event("startup")
+async def on_startup():
+    print("🔥 Server is starting...")
+    from app.utils.session_store import cleanup_expired_sessions
+    cleanup_expired_sessions()
 
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8104)
+@app.on_event("shutdown")
+async def on_shutdown():
+    print("🧼 Server is shutting down. Cleaning up...")
+    from app.utils.session_store import cleanup_expired_sessions
+    cleanup_expired_sessions()
