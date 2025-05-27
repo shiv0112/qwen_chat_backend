@@ -38,6 +38,22 @@ services:
     networks:
       - docker-network
 
+  chainlit-ui:
+    build:
+      context: ./chainlit
+    image: vllm-qwen3-chainlit:latest
+    container_name: chainlit-ui
+    ports:
+      - "8007:8007"
+    depends_on:
+      - backend-service
+    networks:
+      - docker-network
+    environment:
+      - BACKEND_URL=http://backend-service:8006/qwen3/chat
+    command: >
+      chainlit run app.py --host 0.0.0.0 --port 8007
+
 networks:
   docker-network:
     external: true
