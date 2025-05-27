@@ -2,7 +2,7 @@ import asyncio
 import traceback
 from vllm import LLM, SamplingParams
 from fastapi.responses import StreamingResponse
-from typing import List, AsyncGenerator
+from typing import AsyncGenerator
 from app.config import MODEL_PATH, STOP_SEQUENCES
 from app.schemas.generate_schemas import GenRequest, GenChunk
 from app.services.prompt_builder import chat_messages_to_qwen_prompt
@@ -29,12 +29,16 @@ async def generate_response(req: GenRequest):
     )
 
     if not req.stream:
-        outputs = await asyncio.get_event_loop().run_in_executor(
-            None, lambda: llm.generate(prompts, sampling_params)
-        )
-        text = outputs[0].outputs[0].text
-        print("\n=== Raw Output ===\n", text, "\n==================\n")
-        return {"text": text.split("<|im_end|>")[0]}
+        try:
+            outputs = await asyncio.get_event_loop().run_in_executor(
+                None, lambda: llm.generate(prompts, sampling_params)
+            )
+            text = outputs[0].outputs[0].text
+            print("\n=== Raw Output ===\n", text, "\n==================\n")
+            return {"text": text.split("<|im_end|>")[0].strip()}
+        except Exception as e:
+            traceback.print_exc()
+            return {"error": str(e)}
 
     async def token_stream() -> AsyncGenerator[str, None]:
         prev_text = ""
@@ -46,7 +50,10 @@ async def generate_response(req: GenRequest):
                 new_text = text[len(prev_text):]
                 prev_text = text
                 if new_text:
-                    yield GenChunk(token=new_text).json() + "\n"
+                    chunk = GenChunk(token=new_text).json()
+                    print(">>> Token:", new_text)  # ✅ Optional: debug each chunk
+                    yield chunk + "\n"
+                    await asyncio.sleep(0)  # ✅ ensure event loop yields
         except Exception as e:
             yield f'{{"error": "{str(e)}"}}\n'
 
