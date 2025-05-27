@@ -4,8 +4,8 @@ from vllm import LLM, SamplingParams
 from fastapi.responses import StreamingResponse
 from typing import List, AsyncGenerator
 from app.config import MODEL_PATH, STOP_SEQUENCES
-from app.schemas.generate_schema import GenRequest, GenChunk
-from app.service.prompt_builder import chat_messages_to_qwen_prompt
+from app.schemas.generate_schemas import GenRequest, GenChunk
+from app.services.prompt_builder import chat_messages_to_qwen_prompt
 
 llm = LLM(model=MODEL_PATH, dtype="auto")
 

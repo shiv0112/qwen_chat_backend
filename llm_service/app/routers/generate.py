@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas.generate_schema import GenRequest
-from app.service.inference import generate_response
+from app.schemas.generate_schemas import GenRequest
+from app.services.inference import generate_response
 
 router = APIRouter()
 
