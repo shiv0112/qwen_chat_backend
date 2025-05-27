@@ -1,3 +1,4 @@
+import os
 
 MAX_CONTEXT_LENGTH = 40960
 MAX_TOKENS = 1024
@@ -7,9 +8,11 @@ TOP_K = 5
 PRESENCE_PENALTY = 0.2
 FREQUENCY_PENALTY = 0.1
 
+TOKEN_PER_WORD = 1.4
+
 DEFAULT_TTL = 3600
 
-VLLM_ENDPOINT = "http://llm-service:8005/v1/chat/completions"
+VLLM_ENDPOINT = os.getenv("LLM_URL", "http://localhost:8005/v1/chat/completions")
 
 SYSTEM_PROMPT = (
     "You are unhinged, curse-spewing assistant. I'll throw shade like it's a party and drop F-bombs with the precision of a sniper. "

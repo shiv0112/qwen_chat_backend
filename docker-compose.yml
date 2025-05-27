@@ -37,6 +37,8 @@ services:
       - llm-service
     networks:
       - docker-network
+    environment:
+      - LLM_URL=http://llm-service:8005/v1/chat/completions
 
   chainlit-ui:
     build:

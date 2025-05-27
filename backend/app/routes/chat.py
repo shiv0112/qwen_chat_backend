@@ -9,7 +9,7 @@ from app.utils.session_store import get_session, save_session
 from app.utils.prompt_builder import build_prompt
 from app.config import (
     SYSTEM_PROMPT,
-    MAX_CONTEXT_LENGTH,
+    TOKEN_PER_WORD,
     VLLM_ENDPOINT
 )
 
@@ -32,7 +32,7 @@ async def chat(request: ChatRequest):
     history.append({"role": "user", "content": user_message})
 
     # Trim prompt
-    messages = build_prompt(SYSTEM_PROMPT, history, MAX_CONTEXT_LENGTH, request.max_tokens)
+    messages = build_prompt(SYSTEM_PROMPT, history, tokens_used)
 
     # Build payload
     vllm_payload = {
@@ -72,7 +72,7 @@ async def chat(request: ChatRequest):
             yield "data: [DONE]\n"
 
             # Save assistant response after streaming completes
-            approx_tokens = int(len(buffer.split()) * 1.3)
+            approx_tokens = int(len(buffer.split()) * TOKEN_PER_WORD)
             history_snapshot.append({"role": "assistant", "content": buffer})
             tokens_snapshot += approx_tokens
             save_session(session_id, {"messages": history_snapshot, "tokens_used": tokens_snapshot})
