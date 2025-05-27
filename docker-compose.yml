@@ -18,6 +18,7 @@ services:
       --tokenizer ./models
       --port 8005
       --dtype float16
+      --max-num-seqs 16
     deploy:
       resources:
         reservations:

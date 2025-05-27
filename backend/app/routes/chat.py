@@ -59,6 +59,8 @@ async def chat(request: ChatRequest):
 
         async def stream_response(history_snapshot, tokens_snapshot):
             buffer = ""
+
+            yield f"data: {json.dumps({'type': 'session', 'session_id': session_id})}\n\n"
             async with httpx.AsyncClient(timeout=60.0) as client:
                 async with client.stream("POST", VLLM_ENDPOINT, json=vllm_payload) as response:
                     async for line in response.aiter_lines():
@@ -73,6 +75,7 @@ async def chat(request: ChatRequest):
                             except Exception:
                                 pass
                             yield line.strip() + "\n"
+            yield "data: [DONE]\n"
 
             # Save assistant response after streaming completes
             approx_tokens = int(len(buffer.split()) * 1.3)
