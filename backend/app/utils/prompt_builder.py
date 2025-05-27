@@ -1,23 +1,13 @@
-from app.config import MAX_CONTEXT_LENGTH, MAX_TOKENS, TOKEN_PER_WORD
-
-def estimate_tokens(msgs):
-        return int(sum(len(m["content"].split()) * TOKEN_PER_WORD for m in msgs)) 
+from app.config import TOKEN_PER_WORD, MAX_CONTEXT_LENGTH, MAX_HISTORY_LEN
 
 def build_prompt(
     system_prompt: str,
-    history: list,
-    max_model_len: int = MAX_CONTEXT_LENGTH,
-    reserved_response_tokens: int = MAX_TOKENS
+    history: list
 ):
     """
-    Builds a prompt with a system prompt and trimmed message history based on token usage.
-    Ensures the system prompt is never removed. Trims from the top of history if token limit is exceeded.
+    Builds a prompt by stacking the system prompt and the last `max_history_len` messages from history.
+    Does not consider token limits for now, only message count.
     """
-    available_tokens = max_model_len - reserved_response_tokens
     prompt = [{"role": "system", "content": system_prompt}]
-
-    trimmed = history[:]
-    while estimate_tokens(prompt + trimmed) > available_tokens and len(trimmed) > 1:
-        trimmed.pop(0)  # drop oldest message from history
-
-    return prompt + trimmed
+    trimmed_history = history[-MAX_HISTORY_LEN:]  # Keep latest N messages
+    return prompt + trimmed_history

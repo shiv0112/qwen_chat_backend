@@ -32,7 +32,9 @@ async def chat(request: ChatRequest):
     history.append({"role": "user", "content": user_message})
 
     # Trim prompt
-    messages = build_prompt(SYSTEM_PROMPT, history, tokens_used)
+    messages = build_prompt(SYSTEM_PROMPT, history)
+
+    print(f"{'*' * 10} Prompt {'*' * 10} \n{messages}\n{'*' * 10} Prompt {'*' * 10}")
 
     # Build payload
     vllm_payload = {

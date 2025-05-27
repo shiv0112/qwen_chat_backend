@@ -3,3 +3,5 @@ redis
 dotenv
 fastapi
 uvicorn
+transformers
+tiktoken
