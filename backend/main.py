@@ -15,7 +15,7 @@ app.add_middleware(
 )
 
 # Register routes
-app.include_router(chat.router, prefix="/chat", tags=["Chat"])
+app.include_router(chat.router, prefix="/qwen3", tags=["Chat"])
 app.include_router(sessions.router, prefix="/sessions", tags=["Session"])
 
 # Optional: TTL cleanup or model warmup on startup
@@ -28,3 +28,7 @@ async def on_startup():
 async def on_shutdown():
     print("🧼 Server is shutting down. Cleaning up...")
     _cleanup_expired_sessions()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8006)
