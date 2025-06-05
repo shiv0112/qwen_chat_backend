@@ -42,10 +42,9 @@ def get_all_sessions():
     _cleanup_expired_sessions()
     return {
         session_id: {
-            "messages": session_data["messages"],
-            "expires_in": int(session_data["expiry"] - time.time()),
+            "expires_in": f"{int((session_data['expiry'] - time.time()) // 60)} minutes and "
+                          f"{int((session_data['expiry'] - time.time()) % 60)} seconds",
             "tokens_used": session_data.get("tokens_used", 0),
         }
         for session_id, session_data in SESSION_STORE.items()
     }
-

@@ -3,6 +3,7 @@ from app.utils.session_store import (
     get_all_sessions,
     delete_session,
     clear_all_sessions,
+    get_session
 )
 
 router = APIRouter()
@@ -13,6 +14,13 @@ def list_sessions():
     List all active sessions with metadata.
     """
     return get_all_sessions()
+
+@router.get("/{session_id}")
+def get_specific_session(session_id: str):
+    """
+    Get details of a specific session by ID.
+    """
+    return get_session(session_id)
 
 @router.delete("/{session_id}")
 def delete_specific_session(session_id: str):
