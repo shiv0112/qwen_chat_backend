@@ -1,19 +1,10 @@
-# app.py
 import os
 import json
 import time
 import httpx
 import chainlit as cl
 
-
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8006/qwen3/chat")
-
-
-# Session state
-session_state = {
-    "session_id": None,
-    "locked": False,
-}
 
 # Hardcoded generation parameters
 GENERATION_PARAMS = {
@@ -30,12 +21,13 @@ GENERATION_PARAMS = {
 
 @cl.on_chat_start
 async def start_chat():
-    session_state["session_id"] = None
-    session_state["locked"] = False
+    cl.user_session.set("session_id", None)
+    cl.user_session.set("locked", False)
 
     await cl.Message(
         content="Welcome !! Send your first message to get started !!"
     ).send()
+
 
 @cl.on_message
 async def handle_message(message: cl.Message):
@@ -44,15 +36,15 @@ async def handle_message(message: cl.Message):
         await cl.Message(content="📁 File uploads are disabled for now.").send()
         return
 
-@cl.on_message
-async def handle_message(message: cl.Message):
+    # Prepare payload
     payload = {
         "message": message.content,
         **GENERATION_PARAMS
     }
 
-    if session_state["session_id"]:
-        payload["session_id"] = session_state["session_id"]
+    session_id = cl.user_session.get("session_id")
+    if session_id:
+        payload["session_id"] = session_id
 
     start_time = time.time()
     thinking = False
@@ -84,8 +76,8 @@ async def handle_message(message: cl.Message):
                     continue
 
                 if json_data.get("type") == "session":
-                    session_state["session_id"] = json_data["session_id"]
-                    session_state["locked"] = True
+                    cl.user_session.set("session_id", json_data["session_id"])
+                    cl.user_session.set("locked", True)
                     continue
 
                 choices = json_data.get("choices", [])
@@ -125,7 +117,6 @@ async def handle_message(message: cl.Message):
             await final_answer.send()
 
         except Exception as e:
-            # If still visible, update the placeholder with error
             try:
                 await placeholder.update(content=f"❌ Error: {e}")
             except Exception:
