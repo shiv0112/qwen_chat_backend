@@ -15,6 +15,39 @@ from app.config import (
 
 router = APIRouter()
 
+from fastapi import Request
+
+@router.post("/chat/init")
+async def init_chat_mode(request: Request):
+    body = await request.json()
+    mode = body.get("mode")
+
+    if mode not in ["image", "chat", "assistant"]:
+        return JSONResponse(status_code=400, content={"error": "Invalid mode"})
+
+    session_id = str(uuid.uuid4())
+
+    # session id
+    session = get_session(session_id)
+    history = session.get("messages", [])
+    tokens_used = session.get("tokens_used", 0)
+
+    # You can inject a system prompt based on the mode, or add more structure later
+    system_message = {"role": "system", "content": f"Mode selected: {mode}"}
+    session_data = {
+        "messages": [system_message],
+        "tokens_used": 0,
+        "mode": mode
+    }
+
+    save_session(session_id, session_data)
+
+    return JSONResponse(content={
+        "session_id": session_id,
+        "mode": mode
+    })
+
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     user_message = request.message
